@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&display=swap" rel="stylesheet">
+
+<style>
+    body{
+        font-family: 'Architects Daughter', cursive;
+        background-image: url('sf.jpg');
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: cover;
+        text-align: center;
+        font-size: 20px;
+        transition: background-image .7s ease-in-out;
+        -moz-transition: background-image .7s ease-in-out;
+        -webkit-transition: background-image .7s ease-in-out; 
+        -o-transition: background-image .7s ease-in-out; 
+    }
+
+    #tab {
+        text-align: right;
+    }
+
+    button {
+        cursor: pointer;
+        width: 210px;
+        height: 40px;
+        display: inline-block;
+        background-color: #5A605F;
+        color: whitesmoke;
+        text-align: center;
+        transition: .25s ease;
+        border: none;
+        padding: 10px;
+        border-radius: 5px 30px 0 0;
+        margin-top: 0.5em;
+        font-size: 17px;
+        font-family: 'Century Gothic';
+        
+    }
+
+    .tablink:hover {
+    background-color: #3C403F;
+    }
+
+    #home {
+        background-color: #3C403F;
+    }
+
+    hr {
+        display: block;
+        margin-top: 0em;
+        margin-bottom: 0.1em;
+        margin-left: 0em;
+        margin-right: 0em;
+        height:8px;
+        border-width:0;
+        color:gray;
+        background-color: #3C403F;
+        border-width: 0px;
+    }
+
+    h1{
+        font-size: 72px;
+        margin-bottom: -25px;
+        margin-top: 25px;
+    }
+
+    #welcome {
+        margin: auto;
+        border: 5px solid;
+        background-color: #EFFEFF;
+        width: 750px;
+        height: 300px;
+    }
+    
+</style>
+
+<body>
+    <div id ="tab">
+        <button class="tablink" id = "home" >Home</button>
+        <button class="tablink" id = "ddashboard" onclick="window.location.href = 'dashboard1.html';">Disease Dashboard</button>
+        <button class="tablink" id = "fdashboard" onclick="window.location.href = 'Factors.html';">Factors Dashboard</button>
+        <hr>
+    </div>
+
+    <div><br><br><br><br><br><br></div>
+
+    <div id="welcome">
+        <h1>Welcome</h1>
+        <h2>How Socioeconomic Factors Affect <br> The Cases of Infectious Diseases in California?</h2>
+        By: Yap Mou En & Lim Ying Shen
+    </div>
+</body>
+
+<script>
+    var i = 0;
+    var images = [];
+    var slideTime = 3000; // 3 seconds
+    
+    images[0] = 'images/sf.jpg'
+    images[1] = 'images/la.jpg'
+    images[2] = 'images/infectious.jpg'
+    images[3] = 'images/doctor.jpg'
+    images[4] = 'images/gender.jpg'
+    images[5] = 'images/gdp.jpg'
+    images[6] = 'images/population.jpg'
+
+    function changePicture() {
+        document.body.style.backgroundImage = "url(" + images[i] + ")";
+
+        if (i < images.length - 1) {
+            i++;
+        } else {
+            i = 0;
+        }
+        setTimeout(changePicture, slideTime);
+    }
+
+    window.onload = changePicture;
+</script>
+    

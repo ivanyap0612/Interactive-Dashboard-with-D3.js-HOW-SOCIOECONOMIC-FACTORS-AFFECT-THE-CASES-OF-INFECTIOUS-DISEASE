@@ -1,0 +1,59 @@
+﻿Disease,Symptoms,Transmission
+Amebiasis,"Diarrhea, Stomach pains, Cramping, Nausea, Loss of appetite, Fever",Eating or drinking infected food or water
+Anaplasmosis,"Fever, Headache, Muscle ashes, Chills and shaking",Attached by tick for at least 12-24 hours
+Anaplasmosis and Ehrlichiosis,"Fever, Headache, Muscle ashes, Chills and shaking",Biting of ticks from wildlife
+Anthrax,"Fever, Swellling of neck, Sore throat, Nausea and vomiting, Headache",Inhale spores from infected animals or animals product
+Babesiosis,"Fever, Chills, Sweats, Headache, Body Ashes, Nausea",Biting of ticks from wildlife
+"Botulism, Foodborne","Difficulty swallowing, Muscle weakness, Difficulty breathing, Double vision, Drooping eyelids",Eating contaminated food
+"Botulism, Other","Difficulty swallowing, Muscle weakness, Difficulty breathing, Double vision, Drooping eyelids",Infants ingest spores or adults ingest spores when the person has bowel abnormalitites
+"Botulism, Wound","Difficulty swallowing, Muscle weakness, Difficulty breathing, Double vision, Drooping eyelids",Through wound
+Brucellosis,"Fever, Chills, Loss of appetite, Sweats, Joint, muscle and back pain, Headache","Through direct contact with blood, placenta or fetuses of animals or ingest contiminated raw animals product"
+Campylobacteriosis,"Fever, Bloody diarrhea, Stomach cramps, Nausea, Vomiting",Ingesting raw or undercooked poultry or contaminated food
+Chikungunya Virus Infection,"Fever, Joint pain, Headache, Muscle pain , Rashes",Through biting of infected mosquito
+Cholera,"Watery diarrhea, Vomiting, Thirst, Leg cramps, Restlessness",Drinking water or eating contaminted food
+Ciguatera Fish Poisoning,"Nausea, Vomiting, Diarrhea, Headache, Muscle ashes",Eating reef fish that contains ciguatoxins
+Coccidioidomycosis,"Fatigue, Cough, Fever, Shortness of breath, Headache",Inhalation of airbone spores of C. immitis or C. posadasii
+Creutzfeldt-Jakob Disease and other Transmissible Spongiform Encephalopathies,"Loss of intellect and memory, Changes in personality, Loss of balance and co-ordination",Injection or consuming infected brain or nervous tissue
+Cryptosporidiosis,"Watery diarrhea, Stomach cramps or pain, Dehydration, Nausea, Vomiting",Through feces of infected humans and animals
+Cyclosporiasis,"Watery diarrhea, Loss of appetite, Weight loss, Cramping, Bloating",Consuming food or water contaminted with feces that contains the parasite
+Cysticercosis or Taeniasis,"Severe headache, Blindness, Convulsions, Epileptic seizures",Ingesting undercooked pork that infects with the parasite's larval cysts
+Dengue Virus Infection,"Headache, Muscle, bone or joint pain, Nausea, Vomiting, Swollen glands",Biting of infected Aedes species mosquitoes
+Domoic Acid Poisoning,"Vomiting, Nausea, Diarrhea, Abdominal cramps",Ingesting contaminated molluscan shellfish or crabs
+E. coli O157,"Abdominal cramps, Bloody diarrhea, Fatigue, Nausea",Consuming contaminated food like raw meat or raw milk
+E. coli Other STEC (non-O157),"Abdominal cramps, Bloody diarrhea, Fatigue, Nausea",Consuming contaminated food like raw meat or raw milk
+Ehrlichiosis,"Fever, Severe headache, Muscle ashes, Nausea, Vomiting, Diarrhea",Bite of infected tick
+Flavivirus Infection of Undetermined Species,"Fever, Body aches, Headche, Joint pain",Through ticks or mosquitoes
+Giardiasis,"Diarrhea, Foul-smelling and greasy poop, Stomach cramps, Dehydration, Gas",Eating and drinking contaminted food or water
+Hantavirus Infection,"Fatigue, Fever, Muscle Aches",Through inhaling virus particles
+Hemolytic Uremic Syndrome (HUS),"Pale coloring, Extreme fatigue, Shortness of breath, Easy brusing, Unusual bleeding",Cannot spread from person-to-person but can speread through STEC organims
+Hemolytic Uremic Syndrome (HUS) without evidence of Shiga toxin-producing E. coli (STEC),"Pale coloring, Extreme fatigue, Shortness of breath, Easy brusing, Unusual bleeding",Cannot spread from person-to-person but can speread through STEC organims
+"Hepatitis E, acute infection","Fever, Fatigue, Loss of appetite, Nausea, Vomiting, Abdominal pain",Drinking contaminated water or eating contaminted food
+Legionellosis,"High temperature, feverishness and chills, Cough, Muscle pains, Headache, Diarrhea","Inhalation of contaminated aerosols produced in conjunction with water sprays, jets or mists"
+Leprosy (Hansen's Disease),"Discolored patches of skin, Nodules on skin, Thick and dry skin",Inhale droplets from coughs or sneezes of infected person that contains the bacteria 
+Leptospirosis,"Fever, Headache, Muscle aches, Chills, Vomiting",Through urine of infected animals
+Listeriosis,"Fever, Chills, Muscle ache, Stiff neck, Loss of balance",Ingesting contaminated food like raw milk or contaminted vegetables
+Lyme Disease,"Fever, Headache, Fatigue, Rashes called erythema migrans",Biting of infected ticks
+Malaria,"Fever, Chills, Headache, Muscle aches, Tiredness",Biting of infected female Anopheles mosquito
+Paralytic Shellfish Poisoning,"Tingling, Numbness, Dizziness, Arm and leg weakness, Headache",Eating shellfish containing the toxin
+Paratyphoid Fever,"Diarrhea, Fatigue, Fever, Headache, Loss of appetite, Skin rash",Sewage contamination of food or water and through person-to-person contact.
+"Plague, human","Fever and chills, Extreme weakness, Abdominal pain, Bleeding from mouth, nose or rectum",Through biting of flea
+Psittacosis,"Fever, Headache, Chills, Muscle pains, Cough",Inhaling dust from dried droppings from birdcages or by handling infected birds in slaughterhouses
+Q Fever,"Fever, Chills, Fatigue, Headache, Muscle aches, Nausea, Vomiting, Diarrhea","Thorugh animals like sheep, goats and cattle"
+"Rabies, human","Weakness, Fever, Headache, Cereval dysfunctuin, Anxiety, Confusion",Direct contact with saliva or brain/nervous system tissue from an infected animal
+Relapsing Fever,"Bleeding, Headache, Joint aches, Nausea, Vomiting, Facial droop",By body lice
+Salmonellosis,"Diarrhea, Fever, Stomach cramps",Eating foods contaminated with animal faces
+Scombroid Fish Poisoning,"Tingling and burning sensations around the mouth, Facial flusing, Sweating, Nausea, Vomitting",Eating spoiled fish
+Shiga Toxin Positive Feces (without culture confirmation),"Severe diarrhea, Stomach cramps, Vomiting",Consuming contaminated food like raw meat or raw milk
+Shiga toxin-producing E. coli (STEC) with Hemolytic Uremic Syndrome (HUS),"Severe diarrhea, Stomach cramps, Vomiting",Consuming contaminated food like raw meat or raw milk
+Shiga toxin-producing E. coli (STEC) without Hemolytic Uremic Syndrome (HUS),"Severe diarrhea, Stomach cramps, Vomiting",Consuming contaminated food like raw meat or raw milk
+Shigellosis,"Fever, Bloody diarrhea, Stomach cramps, Dehydration","Direct contact or sexual contact or throguh eating contaminated food, water or fomites"
+Spotted Fever Rickettsiosis,"Headache, Fever, Chills, Muscle aches, Joint pain, Skin rash",By ixodid ticks
+Streptococcal Infection (cases in food and dairy workers),"Sore red throat, Fever and chills, Enlarged and tender lymph nodes around the neck",Person-to-person transmission
+Trichinosis,"Nausea, Vomiting, Diarrhea, Fever, Fatigue, Abdominal discomfort",Eating raw or undercooked meat from animals infected with the parasite
+Tularemia,"Skin ulcer, Swollen and painful lymph glads, Inflamed eyes, Sore throat, Mouth sores",Through contacting infected animal tissue with the skin
+Typhoid Fever,"Weakness, Stomach pain, Headache, Diarrhea, Cough, Loss of appetite",Consume water or food contaminated with the feces of people who have typhoid fever
+Typhus Fever,"Fever and chills, Headache, Rapid Breathing, Muscle aches, Rash",Biting of infected fleas
+Vibrio Infection (non-Cholera),"Vomiting, Diarrhea, Abdominal pain","Eating raw or undercooked seafood, especially shellfish (including oysters, mussels, and clams)."
+Yellow Fever,"Fever, Chills, Headache, Muscle aches, Nausea, Fatigue",Biting of infected Aedes or Haemagogus species mosquitoes
+Yersiniosis,"Fever, Stomach pain, Nausea, Vomitting, Diarrhea, Sore throat",Consume or handle contaminated food like raw or undercooked pork product and untreated water.
+Zika Virus Infection,"Fever, Rash, Joint pain, Muscle pain, Headache, Fatigue",Biting of infected Aedes species mosquitoes

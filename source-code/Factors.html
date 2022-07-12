@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v4.js"></script>
+
+<style>
+    #gdp{
+        float: left;
+        padding-right: 10px;
+    }
+
+    #gender_svg {
+        display: block;
+        margin: 0 auto;
+    }
+
+    div.tooltip {
+        position: absolute;
+        text-align: center;
+        width: 150px;
+        height: 30px;
+        padding: 5px;
+        font: 12px sans-serif;
+        background: lightsteelblue;
+        border: 0px;
+        border-radius: 8px;
+        pointer-events: none;
+    }
+
+    body{
+        font-family: 'Segoe UI';
+        background-image: url('images/body-background.jpg');
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: cover;
+    }
+
+    #selector {
+        text-align-last:center;
+    }
+
+    #title{
+        font-size: 18px;
+        text-align: center;
+        font-family: "Candara";
+    }
+
+    #disease{
+        margin: auto;
+        width: 60%;
+        padding: 10px;
+        text-align-last:center;
+        font-size: 17px;
+    }
+
+    h2{
+        font-family: 'Century Gothic', sans-serif;
+    }
+
+    select{
+        height: 35px !important;
+        width: 200px;
+        border: 1px solid #ABADB3;
+        margin: 0;
+        padding: 10 10 10 10;
+        font-size:15px;
+        font-family: 'Century Gothic';
+    }
+
+    select:focus{
+        min-width: 200px;
+        width: auto;
+    }
+
+    #tab {
+        text-align: right;
+    }
+
+    button {
+        cursor: pointer;
+        width: 210px;
+        height: 40px;
+        display: inline-block;
+        background-color: #5A605F;
+        color: whitesmoke;
+        text-align: center;
+        transition: .25s ease;
+        border: none;
+        padding: 10px;
+        border-radius: 5px 30px 0 0;
+        margin-top: 0.5em;
+        font-size: 17px;
+        font-family: 'Century Gothic';
+        
+    }
+
+    .tablink:hover {
+    background-color: #3C403F;
+    }
+
+    #fdashboard {
+        background-color: #3C403F;
+    }
+
+    hr {
+        display: block;
+        margin-top: 0em;
+        margin-bottom: 0.1em;
+        margin-left: 0em;
+        margin-right: 0em;
+        height:8px;
+        border-width:0;
+        color:gray;
+        background-color: #3C403F;
+        border-width: 0px;
+    }
+</style>
+
+<body>
+    <div id ="tab">
+        <button class="tablink" id = "home" onclick="window.location.href = 'home.html';">Home</button>
+        <button class="tablink" id = "ddashboard" onclick="window.location.href = 'dashboard1.html';">Disease Dashboard</button>
+        <button class="tablink" id = "fdashboard" >Factors Dashboard</button>
+        <hr>
+    </div>
+    <div id="title"></div>
+    <div id="disease">
+        Disease: <select id="diseasesSelectButton"></select> &nbsp;&nbsp;&nbsp;&nbsp;
+        County: <select id="countySelectButton"></select>
+    </div>
+    <div id ="gendertitle">
+        <h2>Gender</h2>
+    </div>
+    
+    <div id="gender" style="text-align:center;">
+        
+    </div>
+
+    <div class="container" id="gdp">
+        <h2>GDP</h2>
+    </div>
+
+    <div class="container" id="population">
+        <h2>Population</h2>
+        <div id="popinfo"></div>
+    </div>
+</body>
+
+<script>
+    var margin = {top: 30, right: 30, bottom: 30, left:80},
+        width = 650 - margin.left - margin.right,
+        height = 600 - margin.top - margin.bottom;
+        barWidth = 1400 - margin.left - 130,
+        barHeight = 600 - margin.top - margin.bottom;
+
+    // append the svg object to the body of the page
+    var gender_svg = d3.select("#gender")
+        .append("svg")
+        .attr("style", "outline: thin solid #FBF8F1;")
+        .attr("width", 1400)
+        .attr("height", 650)
+        .style('background-color', '#F4EEFF')
+        .append("g")
+        .attr("transform","translate(" + margin.left + "," + margin.top + ")");
+
+    var gdp_svg = d3.select("#gdp")
+        .append("svg")
+        .attr("style", "outline: thin solid #FBF8F1;")
+        .attr("width", 720)
+        .attr("height", 650)
+        .style('background-color', '#F4EEFF')
+        .append("g")
+        .attr("transform","translate(" + margin.left + "," + margin.top + ")");
+    
+    var pop_svg = d3.select("#population")
+        .append("svg")
+        .attr("style", "outline: thin solid #FBF8F1;")
+        .attr("width", 720)
+        .attr("height", 650)
+        .style('background-color', '#F4EEFF')
+        .append("g")
+        .attr("transform","translate(" + margin.left + "," + margin.top + ")");
+
+    var tip = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
+
+    d3.queue()
+        .defer(d3.csv, "data/combined.csv")
+        .defer(d3.csv, "data/gender.csv")
+        .await(function(error, data, data2) {
+            if (error) {
+                console.error('Oh dear, something went wrong: ' + error);
+            }
+            else {
+            
+                data.forEach(function(d){
+                    d.Cases = parseInt(d.Cases);
+                    d.Value = parseInt(d.Value);
+                    d.County = d.County;
+                    d.Disease = d.Disease;
+                    d.Sex = d.Sex;
+                    d.Year = d.Year;
+                    d.Population = parseInt(d.Population);
+                });
+
+                data2.forEach(function(d){
+                    d.County = d.County;
+                    d.Disease = d.Disease;
+                    d.Year = d.Year;
+                    d.MALE = parseInt(d.MALE);
+                    d.FEMALE = parseInt(d.FEMALE);
+                });
+
+
+                var countyName = d3.map(data, function(d){return(d.County)}).keys()
+                var diseaseName = d3.map(data, function(d){return(d.Disease)}).keys()
+                var diseaseName = diseaseName.sort(d3.ascending)
+
+                var subgroups = data2.columns.slice(3)
+                var groups = d3.map(data2, function(d){return(d.Year)}).keys()
+
+                var dataBarFirst = data2.filter(function(d){return d.County==countyName[0] && d.Disease==diseaseName[0]})
+                var dataY = data.filter(function(d){return d.County==countyName[0] && d.Sex=="TOTAL" && d.Disease==diseaseName[0]})
+
+                if (d3.max(dataBarFirst, function(d) { return d.MALE; }) > d3.max(dataBarFirst, function(d) { return d.FEMALE; }))
+                {
+                    var barYMax = d3.max(dataBarFirst, function(d) { return d.MALE; });
+                }
+                else
+                {
+                    var barYMax = d3.max(dataBarFirst, function(d) { return d.FEMALE; })
+                }
+
+                d3.select("#countySelectButton")
+                    .selectAll('myOptions')
+                    .data(countyName)
+                    .enter()
+                    .append('option')
+                    .text(function (d) { return d; }) // text showed in the menu
+                    .attr("value", function (d) { return d; }) // corresponding value returned by the button
+                
+                d3.select("#diseasesSelectButton")
+                    .selectAll('myOptions')
+                    .data(diseaseName)
+                    .enter()
+                    .append('option')
+                    .text(function (d) { return d; }) // text showed in the menu
+                    .attr("value", function (d) { return d; }) // corresponding value returned by the button
+                
+                d3.select("#title")
+                    .html("<h1><strong>SOCIOECONOMIC FACTORS AFFECTING INFECTIOUS CASES IN " + countyName[0] + "</strong></h1>")
+                
+                //X-Axis
+                var barX = d3.scaleBand()
+                    .domain(d3.map(dataBarFirst, function(d){return(d.Year)}).keys())
+                    .range([ 0, barWidth ])
+                    //.padding(0.4);
+
+                gender_svg.append("g")
+                    .attr("transform", "translate(0," + barHeight + ")")
+                    .style("font-size","13px")
+                    .call(d3.axisBottom(barX).ticks(7).tickFormat(d3.format('')));
+                gender_svg.append("text")             
+                    .attr("transform",
+                    "translate(" + (barWidth/2) + " ," + 
+                                (barHeight + margin.top + 30) + ")")
+                    .style("text-anchor", "middle")
+                    .style("font-size","17px")
+                    .text("Year");
+
+                var x = d3.scaleLinear()
+                    .domain(d3.extent(data, function(d) { return d.Year; }))
+                    .range([ 0, width ]);
+                
+                gdp_svg.append("g")
+                    .attr("transform", "translate(0," + height + ")")
+                    .style("font-size","13px")
+                    .call(d3.axisBottom(x).ticks(7).tickFormat(d3.format('')));
+                pop_svg.append("g")
+                    .attr("transform", "translate(0," + height + ")")
+                    .style("font-size","13px")
+                    .call(d3.axisBottom(x).ticks(7).tickFormat(d3.format('')));
+                
+                gdp_svg.append("text")             
+                    .attr("transform",
+                    "translate(" + (width/2) + " ," + 
+                                (height + margin.top + 30) + ")")
+                    .style("text-anchor", "middle")
+                    .style("font-size","17px")
+                    .text("Year");
+                pop_svg.append("text")             
+                    .attr("transform",
+                    "translate(" + (width/2) + " ," + 
+                                (height + margin.top + 30) + ")")
+                    .style("text-anchor", "middle")
+                    .style("font-size","17px")
+                    .text("Year");
+
+                //Y-Axis
+                var barY = d3.scaleLinear()
+                    .domain([0, barYMax*1.1])
+                    .range([ barHeight, 0 ]);
+
+                gender_svg.append("g")
+                    .attr("class","barYaxis")
+                    .style("font-size","13px")
+                    .call(d3.axisLeft(barY));
+                gender_svg.append("text")
+                    .attr("transform", "rotate(-90)")
+                    .attr("y", 0 - margin.left+10)
+                    .attr("x",0 - (barHeight / 2))
+                    .attr("dy", "1em")
+                    .style("text-anchor", "middle")
+                    .style("font-size","17px")
+                    .text("Cases"); 
+
+                var y = d3.scaleLinear()
+                    .domain([0, d3.max(dataY, function(d) { return d.Cases; })])
+                    .range([ height, 0 ]);
+                
+                gdp_svg.append("g")
+                    .attr("class","yleftaxis")
+                    .style("font-size","13px")
+                    .call(d3.axisLeft(y))
+                gdp_svg.append("text")
+                    .attr("transform", "rotate(-90)")
+                    .attr("y", 0 - margin.left+10)
+                    .attr("x",0 - (height / 2))
+                    .attr("dy", "1em")
+                    .style("text-anchor", "middle")
+                    .style("font-size","17px")
+                    .style('fill', '#FF7F50')
+                    .text("Cases"); 
+                gdp_svg.append("text")
+                    .attr("transform", "rotate(90)")
+                    .attr("y", -width-90)
+                    .attr("x",(height / 2))
+                    .attr("dy", "1em")
+                    .style("text-anchor", "middle")
+                    .style("font-size","17px")
+                    .style('fill', '#3CB371')
+                    .text("Total GDP ($)"); 
+                
+                pop_svg.append("g")
+                    .style("font-size","13px")
+                    .attr("class","yleftaxis")
+                    .call(d3.axisLeft(y))
+                pop_svg.append("text")
+                    .attr("transform", "rotate(-90)")
+                    .attr("y", 0 - margin.left+10)
+                    .attr("x",0 - (height / 2))
+                    .attr("dy", "1em")
+                    .style("text-anchor", "middle")
+                    .style('fill', '#FF7F50')
+                    .style("font-size","17px")
+                    .text("Cases"); 
+                pop_svg.append("text")
+                    .attr("transform", "rotate(90)")
+                    .attr("y", -width-90)
+                    .attr("x",(height / 2))
+                    .attr("dy", "1em")
+                    .style("text-anchor", "middle")
+                    .style('fill', '#BA55D3')
+                    .style("font-size","17px")
+                    .text("Total Population"); 
+
+                var yGdpRight = d3.scaleLinear()
+                    .domain([0, d3.max(dataY, function(d) { return d.Value; })])
+                    .range([ height, 0 ]);
+                
+                gdp_svg.append("g")
+                    .attr("class","ygdpaxis")
+                    .attr("transform", "translate( " + width + ", 0 )")
+                    .call(d3.axisRight(yGdpRight))
+
+                var yPopRight = d3.scaleLinear()
+                    .domain([0, d3.max(dataY, function(d) { return d.Population; })])
+                    .range([ height, 0 ]);
+
+                pop_svg.append("g")
+                    .attr("class","ypopaxis")
+                    .attr("transform", "translate( " + width + ", 0 )")
+                    .call(d3.axisRight(yPopRight));
+
+                //Intital Gender graphs
+                var xSubgroup = d3.scaleBand()
+                    .domain(subgroups)
+                    .range([0, barX.bandwidth()])
+                    .padding([0.05])
+
+                var color = d3.scaleOrdinal()
+                    .domain(subgroups)
+                    .range(['#ADD3FA','#FFB7C5'])
+
+                var slice = gender_svg.selectAll(".slice")
+                    // Enter in data = loop group per group
+                    .data(dataBarFirst)
+                    .enter().append("g")
+                    .attr("class", "g")
+                    .attr("transform", function(d) { return "translate(" + barX(d.Year) + ",0)"; })
+
+                slice.selectAll("rect")
+                    .data(function(d) { return subgroups.map(function(key) { return {key: key, value: d[key]}; }); })
+                    .enter().append("rect")
+                    .transition()
+                    .duration(500)
+                    .attr("x", function(d) { return xSubgroup(d.key); })
+                    .attr("y", function(d) { return barY(d.value); })
+                    .text(function(d) { return d.value; })
+                    .attr("width", xSubgroup.bandwidth())
+                    .attr("height", function(d) { return barHeight - barY(d.value); })
+                    .attr("fill", function(d) { return color(d.key); })
+                    .delay(function(d,i){console.log(i) ; return(i*100)})  
+                
+                slice.selectAll("text")
+                    .data(function(d) { return subgroups.map(function(key) { return {key: key, value: d[key]}; }); })
+                    .enter().append("text")
+                    .attr("class", "value")
+                    .transition()
+                    .duration(500)
+                    .attr("x", function(d) { return xSubgroup(d.key) + 8; })
+                    .attr("y", function(d) { return barY(d.value) - 5; })
+                    .text(function (d){ return d.value})
+                    
+                    /*
+                    .on('mouseover', function (d) {
+                        d3.select(this).transition()
+                        .duration('50')
+                        .attr('opacity', '.55');
+                        tip.transition()
+                        .duration(50)
+                        .style("opacity", 1);
+                        tip.html("<strong>Sex: </strong>" + d.key + "<br/>" + "<strong>Total Cases: </strong>" + d.value)
+                        .style("left", (d3.event.pageX - 75) + "px")
+                        .style("top", (d3.event.pageY - 50) + "px");
+
+                    })
+                    .on('mouseout', function (d) {
+                        d3.select(this).transition()
+                            .duration('50')
+                            .attr('opacity', '1')
+                        tip.transition()       
+                            .duration(500)      
+                            .style("opacity", 0);
+                    }); 
+                    */ 
+            
+                var legend = gender_svg.selectAll(".legend")
+                    .data(subgroups)
+                    .enter().append("g")
+                    .attr("class", "legend")
+                    .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+                
+                legend.append("rect")
+                    .attr("x", barWidth+30)
+                    .attr("width", 18)
+                    .attr("height", 18)
+                    .style("fill", color);
+
+                legend.append("text")
+                    .attr("x", barWidth+55)
+                    .attr("y", 9)
+                    .attr("dy", ".35em")
+                    .style("text-anchor", "start")
+                    .text(function(d) { return d; });
+
+                //Intital GDP graph
+                var cases_gdp_line = gdp_svg.append('g')
+                    .append("path")
+                    .datum(data.filter(function(d){return d.County==countyName[0] && d.Sex=="TOTAL" && d.Disease==diseaseName[0]}))
+                    .attr("d", d3.line()
+                    .x(function(d) { return x(d.Year) })
+                    .y(function(d) { return y(d.Cases) })
+                    )
+                    .attr("stroke", "#FBCB9C")
+                    .style("stroke-width", 4)
+                    .style("fill", "none")
+                
+                var gdp_line = gdp_svg.append('g')
+                    .append("path")
+                    .datum(data.filter(function(d){return d.County==countyName[0]}))
+                    .attr("d", d3.line()
+                    .x(function(d) { return x(d.Year) })
+                    .y(function(d) { return yGdpRight(d.Value) })
+                    )
+                    .attr("stroke", "#C1E1C1")
+                    .style("stroke-width", 4)
+                    .style("fill", "none")
+
+                const circleEnter = gdp_svg.selectAll("myCircles")
+                    .data(data.filter(function(d){return d.County==countyName[0] && d.Sex=="TOTAL" && d.Disease==diseaseName[0]}))
+                    .enter();
+
+                circleEnter.append("circle")
+                    .attr("fill", "#FF7F50")
+                    .attr("stroke", "none")
+                    .attr("cx", function(d) { return x(d.Year) })
+                    .attr("cy", function(d) { return y(d.Cases) })
+                    .attr("r", 3.5)
+                    .on('mouseover', function (d) {
+                        d3.select(this).transition()
+                        .duration('50')
+                        .attr('opacity', '.55');
+                        tip.transition()
+                        .duration(50)
+                        .style("opacity", 1);
+                        tip.html("<strong>Year: </strong>" + d.Year + "<br/>" + "<strong>Total Cases: </strong>" + d.Cases)
+                        .style("left", (d3.event.pageX - 75) + "px")
+                        .style("top", (d3.event.pageY - 50) + "px");
+                        //d3.select("#info").classed("hidden",false)
+                    })
+                    .on('mouseout', function (d) {
+                        d3.select(this).transition()
+                            .duration('50')
+                            .attr('opacity', '1')
+                        tip.transition()       
+                            .duration(500)      
+                            .style("opacity", 0);
+                    })
+
+                circleEnter.append("circle")
+                    .attr("fill", "#3CB371")
+                    .attr("stroke", "none")
+                    .attr("cx", function(d) { return x(d.Year) })
+                    .attr("cy", function(d) { return yGdpRight(d.Value) })
+                    .attr("r", 3.5)
+                    .on('mouseover', function (d) {
+                        d3.select(this).transition()
+                        .duration('50')
+                        .attr('opacity', '.55');
+                        tip.transition()
+                        .duration(50)
+                        .style("opacity", 1);
+                        tip.html("<strong>Year: </strong>" + d.Year + "<br/>" + "<strong>Total GDP: </strong>$ " + d.Value)
+                        .style("left", (d3.event.pageX - 75) + "px")
+                        .style("top", (d3.event.pageY - 50) + "px");
+                        //d3.select("#info").classed("hidden",false)
+                    })
+                    .on('mouseout', function (d) {
+                        d3.select(this).transition()
+                            .duration('50')
+                            .attr('opacity', '1')
+                        tip.transition()       
+                            .duration(500)      
+                            .style("opacity", 0);
+                    })
+
+                //Initial Population Graph
+                var cases_pop_line = pop_svg.append('g')
+                    .append("path")
+                    .datum(data.filter(function(d){return d.County==countyName[0] && d.Sex=="TOTAL" && d.Disease==diseaseName[0]}))
+                    .attr("d", d3.line()
+                    .x(function(d) { return x(d.Year) })
+                    .y(function(d) { return y(d.Cases) })
+                    )
+                    .attr("stroke", "#FBCB9C")
+                    .style("stroke-width", 4)
+                    .style("fill", "none")
+                
+                var pop_line = pop_svg.append('g')
+                    .append("path")
+                    .datum(data.filter(function(d){return d.County==countyName[0] && d.Sex=="TOTAL" && d.Disease==diseaseName[0]}))
+                    .attr("d", d3.line()
+                    .x(function(d) { return x(d.Year) })
+                    .y(function(d) { return yPopRight(d.Population) })
+                    )
+                    .attr("stroke", "#CDB2E9")
+                    .style("stroke-width", 4)
+                    .style("fill", "none")
+                
+                const circleEnter2 = pop_svg.selectAll("myCircles")
+                    .data(data.filter(function(d){return d.County==countyName[0] && d.Sex=="TOTAL" && d.Disease==diseaseName[0]}))
+                    .enter();
+
+                circleEnter2.append("circle")
+                    .attr("fill", "#FF7F50")
+                    .attr("stroke", "none")
+                    .attr("cx", function(d) { return x(d.Year) })
+                    .attr("cy", function(d) { return y(d.Cases) })
+                    .attr("r", 3.5)
+                    .on('mouseover', function (d) {
+                        d3.select(this).transition()
+                        .duration('50')
+                        .attr('opacity', '.55');
+                        tip.transition()
+                        .duration(50)
+                        .style("opacity", 1);
+                        tip.html("<strong>Year: </strong>" + d.Year + "<br/>" + "<strong>Total Cases: </strong>" + d.Cases)
+                        .style("left", (d3.event.pageX - 75) + "px")
+                        .style("top", (d3.event.pageY - 50) + "px");
+                        //d3.select("#info").classed("hidden",false)
+                    })
+                    .on('mouseout', function (d) {
+                        d3.select(this).transition()
+                            .duration('50')
+                            .attr('opacity', '1')
+                        tip.transition()       
+                            .duration(500)      
+                            .style("opacity", 0);
+                    })
+                
+                circleEnter2.append("circle")
+                    .attr("fill", "	#BA55D3")
+                    .attr("stroke", "none")
+                    .attr("cx", function(d) { return x(d.Year) })
+                    .attr("cy", function(d) { return yPopRight(d.Population) })
+                    .attr("r", 3.5)
+                    .on('mouseover', function (d) {
+                        d3.select(this).transition()
+                        .duration('50')
+                        .attr('opacity', '.55');
+                        tip.transition()
+                        .duration(50)
+                        .style("opacity", 1);
+                        tip.html("<strong>Year: </strong>" + d.Year + "<br/>" + "<strong>Total Population: </strong>" + d.Population)
+                        .style("left", (d3.event.pageX - 75) + "px")
+                        .style("top", (d3.event.pageY - 50) + "px");
+                        //d3.select("#info").classed("hidden",false)
+                    })
+                    .on('mouseout', function (d) {
+                        d3.select(this).transition()
+                            .duration('50')
+                            .attr('opacity', '1')
+                        tip.transition()       
+                            .duration(500)
+                            .style("opacity", 0);    
+                    })  
+                        
+
+                function update() {
+                    var e = document.getElementById("countySelectButton");
+                    var selectedGroup = e.options[e.selectedIndex].text;
+                    var e2 = document.getElementById("diseasesSelectButton");
+                    var selectedGroup2 = e2.options[e2.selectedIndex].text;
+                    var filter = data.filter(function(d){return d.County==selectedGroup && d.Sex=="TOTAL" && d.Disease==selectedGroup2})
+                    console.log(filter)
+                    var barFilter = data2.filter(function(d){return d.County==selectedGroup && d.Disease==selectedGroup2})
+                    //var filter2 = data2.filter(function(d){return d.County==selectedGroup})
+                    var newCasesYScale = d3.max(filter, function(d) { return d.Cases; })
+                    var newGdpYScale = d3.max(filter, function(d) { return d.Value; })
+                    var newPopYScale = d3.max(filter, function(d) { return d.Population; })*1.1
+
+                    if (d3.max(barFilter, function(d) { return d.MALE; }) > d3.max(barFilter, function(d) { return d.FEMALE; }))
+                    {
+                        var newBarYMax = d3.max(barFilter, function(d) { return d.MALE; })*1.1
+                    }
+                    else
+                    {
+                        var newBarYMax = d3.max(barFilter, function(d) { return d.FEMALE; })*1.1
+                    }
+
+                    if (newBarYMax < 10) {
+                        newBarYMax = 10;
+                    }
+
+                    if (newCasesYScale < 10) {
+                        newCasesYScale = 10;
+                    }
+
+                    d3.select("#title")
+                        .html("<h1><strong>SOCIOECONOMIC FACTORS AFFECTING INFECTIOUS CASES IN " + selectedGroup + "</strong></h1>")
+
+                    var newBarY = d3.scaleLinear()
+                        .domain([0, newBarYMax])
+                        .range([height, 0 ]);
+
+                    var newY = d3.scaleLinear()
+                        .domain([0, newCasesYScale])
+                        .range([height, 0 ]);
+                    
+                    var newYGdpRight = d3.scaleLinear()
+                        .domain([0, newGdpYScale])
+                        .range([height, 0 ]);
+                    
+                    var newYPopRight = d3.scaleLinear()
+                        .domain([0, newPopYScale])
+                        .range([height, 0 ]);
+
+                    gender_svg.selectAll("rect").transition().remove()
+
+                    var newSlice = gender_svg.selectAll(".slice")
+                        // Enter in data = loop group per group
+                        .data(barFilter)
+                        .enter().append("g")
+                        .attr("class", "g")
+                        .attr("transform", function(d) { return "translate(" + barX(d.Year) + ",0)"; })
+
+                    newSlice.selectAll("rect")
+                        .data(function(d) { return subgroups.map(function(key) { return {key: key, value: d[key]}; }); })
+                        .enter().append("rect")
+                        .transition()
+                        .attr("x", function(d) { return xSubgroup(d.key); })
+                        .attr("y", function(d) { return newBarY(d.value); })
+                        .attr("width", xSubgroup.bandwidth())
+                        .attr("height", function(d) { return height - newBarY(d.value); })
+                        .attr("fill", function(d) { return color(d.key); })
+                    console.log(barFilter)
+                    /*
+                    newBar.on('mouseover', function (d) {
+                        d3.select(this).transition()
+                        .duration('50')
+                        .attr('opacity', '.55');
+                        tip.transition()
+                        .duration(50)
+                        .style("opacity", 1);
+                        tip.html("<strong>Sex: </strong>" + d.key + "<br/>" + "<strong>Total Cases: </strong>" + d.value)
+                        .style("left", (d3.event.pageX - 75) + "px")
+                        .style("top", (d3.event.pageY - 50) + "px");
+                    })
+                    .on('mouseout', function (d) {
+                        d3.select(this).transition()
+                            .duration('50')
+                            .attr('opacity', '1')
+                        tip.transition()       
+                            .duration(500)      
+                            .style("opacity", 0);
+                    });
+                    */
+                    gender_svg.selectAll(".value").remove();
+                    newSlice.selectAll("text")
+                        .data(function(d) { return subgroups.map(function(key) { return {key: key, value: d[key]}; }); })
+                        .enter().append("text")
+                        .attr("class", "value")
+                        .transition()
+                        .duration(500)
+                        .attr("x", function(d) { return xSubgroup(d.key); })
+                        .attr("y", function(d) { return newBarY(d.value) - 5; })
+                        .text(function (d){ return d.value})
+
+                    gender_svg.selectAll(".legend").remove();
+
+                    var legend = gender_svg.selectAll(".legend")
+                        .data(subgroups)
+                        .enter().append("g")
+                        .attr("class", "legend")
+                        .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+                    
+                    legend.append("rect")
+                        .attr("x", barWidth+30)
+                        .attr("width", 18)
+                        .attr("height", 18)
+                        .style("fill", color);
+
+                    legend.append("text")
+                        .attr("x", barWidth+55)
+                        .attr("y", 9)
+                        .attr("dy", ".35em")
+                        .style("text-anchor", "start")
+                        .text(function(d) { return d; });
+
+                    d3.selectAll(".barYaxis")
+                        .transition()
+                        .call(d3.axisLeft(newBarY));
+
+                    // Give these new data to update line
+                    cases_gdp_line.datum(filter)
+                        .transition()
+                        .duration(1000)
+                        .attr("d", d3.line()
+                            .x(function(d) { return x(d.Year) })
+                            .y(function(d) { return newY(d.Cases) })
+                        )
+                        .attr("stroke", "#FBCB9C")
+                    
+                    cases_pop_line.datum(filter)
+                        .transition()
+                        .duration(1000)
+                        .attr("d", d3.line()
+                            .x(function(d) { return x(d.Year) })
+                            .y(function(d) { return newY(d.Cases) })
+                        )
+                        .attr("stroke", "#FBCB9C")
+                    
+                    gdp_line.datum(filter)
+                        .transition()
+                        .duration(1000)
+                        .attr("d", d3.line()
+                            .x(function(d) { return x(d.Year) })
+                            .y(function(d) { return newYGdpRight(d.Value) })
+                        )
+                        .attr("stroke", "#C1E1C1")
+                    
+                    pop_line.datum(filter)
+                        .transition()
+                        .duration(1000)
+                        .attr("d", d3.line()
+                            .x(function(d) { return x(d.Year) })
+                            .y(function(d) { return newYPopRight(d.Population) })
+                        )
+                        .attr("stroke", "#CDB2E9")
+                    
+
+                    gdp_svg.selectAll("circle").transition().remove()
+
+                    const circleEnterUpdate = gdp_svg.selectAll("myCircles")
+                        .data(filter)
+                        .enter();
+
+                    var newCase = circleEnterUpdate.append("circle")
+                        .attr("fill", "#FF7F50")
+                        .attr("stroke", "none")
+                        .attr("cx", function(d) { return x(d.Year) })
+                        .attr("cy", function(d) { return newY(d.Cases) })
+                        .attr("r", 3.5);
+
+                    var newGdp = circleEnterUpdate.append("circle")
+                        .attr("fill", "#3CB371")
+                        .attr("stroke", "none")
+                        .attr("cx", function(d) { return x(d.Year) })
+                        .attr("cy", function(d) { return newYGdpRight(d.Value) })
+                        .attr("r", 3.5);
+                    
+                    newCase.selectAll("#points").transition()
+                    newGdp.selectAll("#points").transition()
+                        
+                    newCase.on('mouseover', function (d) {
+                            d3.select(this).transition()
+                            .duration('50')
+                            .attr('opacity', '.55');
+                            tip.transition()
+                            .duration(50)
+                            .style("opacity", 1);
+                            tip.html("<strong>Year: </strong>" + d.Year + "<br/>" + "<strong>Total Cases: </strong>" + d.Cases)
+                            .style("left", (d3.event.pageX - 75) + "px")
+                            .style("top", (d3.event.pageY - 50) + "px");
+                            //d3.select("#info").classed("hidden",false)
+                        })
+                        .on('mouseout', function (d) {
+                            d3.select(this).transition()
+                                .duration('50')
+                                .attr('opacity', '1')
+                            tip.transition()       
+                                .duration(500)      
+                                .style("opacity", 0);
+                    })
+
+                    newGdp.on('mouseover', function (d) {
+                            d3.select(this).transition()
+                            .duration('50')
+                            .attr('opacity', '.55');
+                            tip.transition()
+                            .duration(50)
+                            .style("opacity", 1);
+                            tip.html("<strong>Year: </strong>" + d.Year + "<br/>" + "<strong>Total GDP: </strong>$ " + d.Value)
+                            .style("left", (d3.event.pageX - 75) + "px")
+                            .style("top", (d3.event.pageY - 50) + "px");
+                            //d3.select("#info").classed("hidden",false)
+                        })
+                        .on('mouseout', function (d) {
+                            d3.select(this).transition()
+                                .duration('50')
+                                .attr('opacity', '1')
+                            tip.transition()       
+                                .duration(500)      
+                                .style("opacity", 0);
+                    })
+
+                    pop_svg.selectAll("circle").transition().remove()
+
+                    const circleEnterUpdate2 = pop_svg.selectAll("myCircles")
+                        .data(filter)
+                        .enter();
+
+                    var newCase2 = circleEnterUpdate2.append("circle")
+                        .attr("fill", "#FF7F50")
+                        .attr("stroke", "none")
+                        .attr("cx", function(d) { return x(d.Year) })
+                        .attr("cy", function(d) { return newY(d.Cases) })
+                        .attr("r", 3.5);
+
+                    var newPop = circleEnterUpdate2.append("circle")
+                        .attr("fill", "#BA55D3")
+                        .attr("stroke", "none")
+                        .attr("cx", function(d) { return x(d.Year) })
+                        .attr("cy", function(d) { return newYPopRight(d.Population) })
+                        .attr("r", 3.5);
+
+                    newCase2.selectAll("#points").transition()
+                    newPop.selectAll("#points").transition()
+                        
+                    newCase2.on('mouseover', function (d) {
+                            d3.select(this).transition()
+                            .duration('50')
+                            .attr('opacity', '.55');
+                            tip.transition()
+                            .duration(50)
+                            .style("opacity", 1);
+                            tip.html("<strong>Year: </strong>" + d.Year + "<br/>" + "<strong>Total Cases: </strong>" + d.Cases)
+                            .style("left", (d3.event.pageX - 75) + "px")
+                            .style("top", (d3.event.pageY - 50) + "px");
+                            //d3.select("#info").classed("hidden",false)
+                        })
+                        .on('mouseout', function (d) {
+                            d3.select(this).transition()
+                                .duration('50')
+                                .attr('opacity', '1')
+                            tip.transition()       
+                                .duration(500)      
+                                .style("opacity", 0);
+                    })
+
+                    newPop.on('mouseover', function (d) {
+                            d3.select(this).transition()
+                            .duration('50')
+                            .attr('opacity', '.55');
+                            tip.transition()
+                            .duration(50)
+                            .style("opacity", 1);
+                            tip.html("<strong>Year: </strong>" + d.Year + "<br/>" + "<strong>Total Population: </strong>" + d.Population)
+                            .style("left", (d3.event.pageX - 75) + "px")
+                            .style("top", (d3.event.pageY - 50) + "px");
+                            //d3.select("#info").classed("hidden",false)
+                        })
+                        .on('mouseout', function (d) {
+                            d3.select(this).transition()
+                                .duration('50')
+                                .attr('opacity', '1')
+                            tip.transition()       
+                                .duration(500)      
+                                .style("opacity", 0);
+                    })
+                    
+                    d3.selectAll(".yleftaxis")
+                        .transition()
+                        .call(d3.axisLeft(newY));
+                    
+                    d3.selectAll(".ygdpaxis")
+                        .transition()
+                        .attr("transform", "translate( " + width + ", 0 )")
+                        .call(d3.axisRight(newYGdpRight));
+                    
+                    d3.selectAll(".ypopaxis")
+                        .transition()
+                        .attr("transform", "translate( " + width + ", 0 )")
+                        .call(d3.axisRight(newYPopRight));
+                }
+
+                d3.select("#countySelectButton").on("change", function(d) {
+                    update()
+                })
+
+                d3.select("#diseasesSelectButton").on("change", function(d) {
+                    update()
+                })
+            }
+    });
+</script>

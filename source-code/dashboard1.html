@@ -1,0 +1,1244 @@
+<html>
+<head>
+	<title></title>
+
+<script src="//d3js.org/d3.v4.min.js"></script>
+<script src="//d3js.org/topojson.v1.min.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.10.0/d3.min.js"></script>
+<script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.24.0/d3-legend.js"></script>
+<script src="https://d3js.org/colorbrewer.v1.min.js"></script>
+<script src="infoButton.js"></script>
+
+<style>
+
+button {
+        cursor: pointer;
+        width: 210px;
+        height: 40px;
+        display: inline-block;
+        background-color: #5A605F;
+        color: whitesmoke;
+        text-align: center;
+        transition: .25s ease;
+        border: none;
+        padding: 10px;
+        border-radius: 5px 30px 0 0;
+        margin-top: 0.5em;
+        font-size: 17px;
+        font-family: 'Century Gothic';
+        
+    }
+
+.subunit:hover {
+	opacity: 0.7;
+	fill: lightyellow;
+
+}
+
+.exterior-boundary {
+	fill: none;
+	stroke: black;
+	stroke-linejoin: round;
+	stroke-width: 2px;
+}
+
+div.tooltip {
+        position: absolute;
+        text-align: center;
+        width: 150px;
+        height: 50px;
+        padding: 5px;
+        font: 12px sans-serif;
+        background: lightsteelblue;
+        border: 0px;
+        border-radius: 8px;
+        pointer-events: none;
+    }
+body{
+        font-family: 'Segoe UI';
+        background-color: #F0FFFC;
+        font-size: 20px;
+        background-image: url('images/body-background.jpg');
+    }
+
+    #title{
+        font-size: 18px;
+        text-align: center;
+        font-family: "Candara";
+    }
+	
+    #selection{
+		height: 85px;
+        margin: auto;
+        width: 60%;
+        padding: 10px;
+        text-align-last:center;
+        font-size: 20px;
+    }
+ 
+
+	#disease_bar{
+        float: left;
+        padding-right: 10px;
+    }
+ 
+    #county{
+        float: right;
+
+    }
+
+    h1{
+        font-family: 'Century Gothic', sans-serif;
+        text-align: center;
+    }
+    h2{
+        font-family: 'Century Gothic', sans-serif;
+
+    }
+
+    select{
+        height: 45px !important;
+        width: 200px;
+        border: 1px solid #ABADB3;
+        margin: 0;
+        padding: 10 10 10 10;
+        font-size:18px;
+        font-family: 'Century Gothic';
+    }
+    select:focus{
+        min-width: 200px;
+        width: auto;
+    }
+	.barXaxis { 
+        font: 13px sans-serif; }
+
+	.barYaxis { 
+        font: 13px sans-serif; }
+
+    .info {
+        font-family: 'Century Gothic';
+        stroke-width: "0px";
+    }
+
+    .info2 {
+        font-family: 'Century Gothic';
+        stroke-width: "0px";
+    }
+
+    #tab {
+        text-align: right;
+    }
+
+    .tablink:hover {
+    background-color: #3C403F;
+    }
+
+    #ddashboard {
+        background-color: #3C403F;
+    }
+
+    hr {
+        display: block;
+        margin-top: 0em;
+        margin-bottom: 0.1em;
+        margin-left: 0em;
+        margin-right: 0em;
+        height:8px;
+        border-width:0;
+        color:gray;
+        background-color: #3C403F;
+        border-width: 0px;
+    }
+
+    .infoButton rect {
+    stroke: #999faa; /* navy 40% */
+    stroke-width: 2px;
+    }
+
+    .infoButton rect.pressed {
+    fill: #000f2b; /* navy 100% */
+    }
+
+    .infoButton #gradient-start {
+    stop-color: #999faa; /* navy 40% */
+    stop-opacity: 1;
+    }
+
+    .infoButton #gradient-stop {
+    stop-color: #4d576b; /* navy 70% */
+    stop-opacity: 1;
+    }
+
+
+    .infoButton text {
+    font-size: 20px;
+    fill: #eee;
+    pointer-events: none;
+    text-anchor: middle;
+    font-family: 'Century Gothic';
+    }
+
+    .infoButton2 rect {
+    stroke: #999faa; /* navy 40% */
+    stroke-width: 2px;
+    }
+
+    .infoButton2 rect.pressed {
+    fill: red; /* navy 100% */
+    }
+
+    .infoButton2 #gradient-start {
+    stop-color: #4d576b; /* navy 40% */
+    stop-opacity: 1;
+    }
+    .infoButton2 #gradient-stop {
+    stop-color: #999faa; /* navy 70% */
+    stop-opacity: 1;
+    }
+
+    .infoButton2 text {
+    font-size: 20px;
+    fill: #eee;
+    pointer-events: none;
+    text-anchor: middle;
+    font-family: 'Century Gothic';
+
+    }
+
+    .slider {
+        -webkit-appearance: none;
+        width: 150px;
+        height: 10px;
+        border-radius: 5px;  
+        background: #d3d3d3;
+        outline: none;
+        opacity: 0.7;
+        -webkit-transition: .2s;
+        transition: opacity .2s;
+    }
+
+    .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%; 
+        background: #1F51FF;
+        cursor: pointer;
+    }
+
+    .slider::-moz-range-thumb {
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        background: #1F51FF;
+        cursor: pointer;
+    }
+</style>
+
+</head>
+<body>
+    <div id ="tab">
+        <button class="tablink" id = "home" onclick="window.location.href = 'home.html';">Home</button>
+        <button class="tablink" id = "ddashboard" >Disease Dashboard</button>
+        <button class="tablink" id = "fdashboard" onclick="window.location.href = 'Factors.html';">Factors Dashboard</button>
+        <hr>
+    </div>
+	<!-- Initialize a select button -->
+    <div id="title">
+        <h1>OVERVIEW OF INFECTIOUS DISEASE IN CALIFORNIA</h1>
+    </div>
+	<div id="selection">
+		County:
+		<select id="countyButton" ></select>&nbsp;&nbsp;&nbsp;&nbsp;
+		Disease:
+		<select id="diseaseButton"></select>&nbsp;&nbsp;&nbsp;&nbsp;
+		Year:
+        <input type="range" min="2001" max="2018" value="2001" step="1" class="slider" id="yearSlider" oninput="num.value=this.value"> 
+        <output id="num">2001</output>
+	</div>
+	<div id = "map"></div>
+
+    <div class="container" id="disease_map" style="text-align:center;">
+        <!-- ...svgs -->
+    </div>
+    
+    <div class="container" id="disease_bar">
+        <!-- ...svgs -->
+		<h2></h2>
+    </div>
+	<div class="container" id="disease_line">
+        <!-- ...svgs -->
+		<h2></h2>
+    </div>
+
+<script>
+	var line_margin = {top: 50, right: 150, bottom: 30, left: 80},
+        line_width = 650 - line_margin.left - line_margin.right,
+        line_height =  600 - line_margin.top - line_margin.bottom;
+    var margin = {top: 50, right: 30, bottom: 30, left: 130},
+        width = 710 - margin.left - margin.right,
+        height = 600 - margin.top - margin.bottom;
+        mapWidth = 1300 - margin.left - margin.right,
+        mapHeight = 950 - margin.top - margin.bottom;
+
+	var  projection = d3.geoMercator()
+			.scale(1000 * 3)
+			.center([-120, 36])
+			.translate([mapWidth/2, mapHeight/2]);
+	//tooltip
+	var tip = d3.select("body").append("div")
+		.attr("class", "tooltip")
+		.style("opacity", 0);
+
+	var path = d3.geoPath()
+		.projection(projection);
+
+	var map_svg = d3.select("#disease_map").append("svg")
+        .attr("style", "outline: thin solid #FBF8F1;")
+        .attr("width", 1500)
+        .attr("height", 750)
+        .style('background-color', '#F4EEFF')
+        .append("g")
+        .attr("transform","translate(" + margin.left + "," + margin.top + ")");
+
+	var bar_svg = d3.select("#disease_bar")
+	.append("svg")
+        .attr("style", "outline: thin solid #FBF8F1;")
+        .attr("width", 745)
+        .attr("height", 650)
+        .style('background-color', '#F4EEFF')
+        .append("g")
+        .attr("transform","translate(" + margin.left + "," + margin.top + ")");
+		
+	var line_svg = d3.select("#disease_line")
+        .append("svg")
+        .attr("style", "outline: thin solid #FBF8F1;")
+        .attr("width", 745)
+        .attr("height", 650)
+        .style('background-color', '#F4EEFF')
+        .append("g")
+        .attr("transform","translate(" + line_margin.left + "," + line_margin.top + ")");
+
+	d3.queue()
+        .defer(d3.json, "data/caCountiesTopoSimple.json")
+        .defer(d3.csv, "data/combined.csv")
+        .defer(d3.csv, "data/disease_info.csv")
+        .await(function(error, ca, data,disease_info) {
+            if (error) {
+                console.error('Error, something went wrong: ' + error);
+            }
+            else {
+				console.log(data)
+                data.forEach(function(d){
+                    d.Cases = parseInt(d.Cases);
+                    d.County = d.County;
+                    d.Disease = d.Disease;
+                    d.Sex = d.Sex;
+                    d.Year = d.Year;
+                    d.Population = parseInt(d.Population);
+                });
+				var countyName = d3.map(data, function(d){return(d.County)}).keys()
+    			var diseaseName = d3.map(data, function(d){return(d.Disease)}).keys()
+                var diseaseName = diseaseName.sort(d3.ascending)
+				var yearName = d3.map(data, function(d){return(d.Year)}).keys()
+                var transPath=d3.map(disease_info, function(d){return(d.Transmission)}).keys()
+                var symptoms=d3.map(disease_info, function(d){return(d.Symptoms)}).keys()
+            
+
+				d3.select("#countyButton")
+				.selectAll('option')
+					.data(countyName)
+				.enter()
+					.append('option')
+				.text(function (d) { return d; }) // text showed in the menu
+				.attr("value", function (d) { return d; }) // corresponding value returned by the button
+
+				d3.select("#diseaseButton")
+				.selectAll('myOptions')
+				.data(diseaseName)
+				.enter()
+				.append('option')
+				.text(function (d) { return d; }) // text showed in the menu
+				.attr("value", function (d) { return d; }) // corresponding value returned by the button
+
+				d3.select("#yearButton")
+				.selectAll('myOptions')
+				.data(yearName)
+				.enter()
+				.append('option')
+				.text(function (d) { return d; }) // text showed in the menu
+				.attr("value", function (d) { return d; }) // corresponding value returned by the button
+
+				var map_data_filter = data.filter(function(d){return (d.County != 'CALIFORNIA') && d.Sex=="TOTAL" && d.Disease==diseaseName[0] && d.Year==yearName[0]})
+				var bar_data_filter = data.filter(function(d){return d.County==countyName[0] && d.Sex=="TOTAL" && d.Year==yearName[0]})
+				var line_data_filter = data.filter(function(d){return d.County==countyName[0] && (d.County != 'CALIFORNIA') && d.Sex=="TOTAL" })
+                
+				//**********************************************MAP****************************************************//
+
+                
+				var county_map = d3.map()
+				map_data_filter.forEach(function(d){
+					county_map.set(d.County, d.Cases)
+                });
+				//console.log(county_map)
+				var colorScheme = d3.schemeReds[6];
+					colorScheme.unshift("#eee")
+					var colorScale = d3.scaleThreshold()
+						.domain([1, 26, 51, 76, 101,1001])
+						.range(colorScheme);
+				
+				var sorting = map_data_filter.sort(function(a,b) { return -a.Cases - -b.Cases })
+				
+                map_svg.append("path")
+                    .datum(topojson.feature(ca, ca.objects.subunits))
+                    .attr("class", "land")
+                    .attr("d", path);
+
+                //bind feature data to the map
+                map_svg.selectAll(".subunit")
+                    .data(topojson.feature(ca, ca.objects.subunits).features)
+                    .enter().append("path")	
+                    .attr("class", "subunit")
+                    .attr("d", path)			
+                    .attr("fill", function(d) {
+                        d.Cases = county_map.get((d.properties.name).toUpperCase()) || 0;
+                        //console.log(d.Cases)
+                        // Set the color
+                        //console.log(colorScale(d.Cases))
+                        return colorScale(d.Cases);
+                        
+                    })
+                    .on("mouseover", function(d){
+                        div.transition()
+                            .duration(200)
+                            .style("opacity", .9);
+                            //sorting.findIndex(x => x.County =="SANTA CRUZ") + 1
+                            div.html("<strong>County: </strong>" + (d.properties.name) + "<br/>" + "<strong>Total Cases: </strong>" + county_map.get((d.properties.name).toUpperCase()) + "<br/>"+ "<strong>Ranking: </strong>" + (sorting.findIndex(x => x.County ==(d.properties.name).toUpperCase()) + 1))
+                            .style("left", (d3.event.pageX) + 75 + "px")
+                            .style("top", (d3.event.pageY - 50) + "px"); 
+                    })
+                    .on("mouseout", function(d) { 
+                        div.transition()
+                            .duration(500)
+                            .style("opacity", 0.0);
+                    });
+
+                    // Legend
+                    var map_g = map_svg.append("g")
+                        .attr("class", "legendThreshold")
+                        .attr("transform", "translate(20,60)");
+                    map_g.append("text")
+                        .attr("class", "caption")
+                        .attr("x", 0)
+                        .attr("y", -20)
+                        .style("font-size","20px")
+                        .text("Cases");
+                    var labels = ['0', '1-25', '26-50', '51-75', '76-100', '101-1000','> 1000'];
+                    var map_legend = d3.legendColor()
+                        .labels(function (d) { return labels[d.i]; })
+                        .shapePadding(4)
+                        .scale(colorScale);
+                    map_svg.select(".legendThreshold")
+                    .call(map_legend);
+                    
+                    //map title
+                    map_svg.append("text")
+                            .attr("class", "txt")
+                            .attr("x", (1300/2))              
+                            .attr("y", 15 - (margin.top / 2))
+                            .attr("text-anchor", "middle")  
+                            .style("font-size", "25px") 
+                            //.attr("padding-bottom","20px")    
+                            .text("Severity of "+ diseaseName[0] +  " in Year " + yearName[0]);
+
+                //exterior border
+                map_svg.append("path")
+                    .datum(topojson.mesh(ca, ca.objects.subunits, function(a, b) { return a === b;}))
+                    .attr("d", path)
+                    .attr("class", "exterior-boundary");
+
+                //tooltop declaration
+                var div = d3.select("#disease_map").append("div")
+                    .attr("class", "tooltip")
+                    .style("opacity", 0);
+                
+                img_name = diseaseName[0]
+                var imgs = map_svg.selectAll("img").data([0]);
+                imgs.enter()
+                .append("svg:image")
+                .attr("xlink:href", "disease/"+ img_name + ".jpg")
+                .attr("class","image")
+                .attr("x", "980")
+                .attr("y", "50")
+                .attr("width", "250")
+                .attr("height", "250");
+                
+                function wrap(text, width) {
+            text.each(function () {
+                var text = d3.select(this),
+                    words = text.text().split(/ +/).reverse(),
+                    word,
+                    line = [],
+                    lineNumber = 0,
+                    lineHeight = 1.1, // ems
+                    x = text.attr("x"),
+                    y = text.attr("y"),
+                    dy = 0, //parseFloat(text.attr("dy")),
+                    tspan = text.text(null)
+                                .append("tspan")
+                                .attr("x", x)
+                                .attr("y", y)
+                                .attr("dy", dy + "em");
+                while (word = words.pop()) {
+                    line.push(word);
+                    tspan.text(line.join(" "));
+                    if (tspan.node().getComputedTextLength() > width) {
+                        line.pop();
+                        tspan.text(line.join(" "));
+                        line = [word];
+                        tspan = text.append("tspan")
+                                    .attr("x", x)
+                                    .attr("y", y)
+                                    .attr("dy", ++lineNumber * lineHeight + dy + "em")
+                                    .text(word);
+                    }
+                }
+            });
+        }
+                var button = d3.button()
+                    .on('press', function(d, i) {
+                        map_svg.selectAll(".info").remove();
+                        map_svg.selectAll(".info2").remove();
+                        map_svg.selectAll("text.info")
+                            .data(disease_info)
+                            .enter()
+                            .append("text")
+                            .attr("x", "900")              
+                            .attr("y", "400")
+                            .attr("class", "info")
+                            .style("font-size", "20px")
+                            //.style('font-weight','bold') 
+                            //.attr("fill", "#3C403F")
+                            //.attr("padding-bottom","20px")    
+                            .text(symptoms[0] )
+                            .call(wrap, 450);
+                            
+
+                    })
+                    .on('release', function(d, i) { 
+                        map_svg.selectAll(".info").remove();
+                    });
+                
+                var button2 = d3.button()
+                    .on('press', function(d, i) { 
+
+                        map_svg.selectAll(".info2").remove();
+                        map_svg.selectAll(".info").remove();
+                        map_svg.selectAll("text.info2")
+                            .data(disease_info)
+                            .enter()
+                            .append("text")
+                            .attr("x", "900")              
+                            .attr("y", "400")
+                            .attr("class", "info2")
+                            .style("font-size", "20px") 
+                            //.style('font-weight','bold')
+                            //.attr("fill", "#3C403F") 
+                            //.attr("padding-bottom","20px")    
+                            .text(transPath[0] )
+                            .call(wrap, 450);
+
+                        
+                    })
+                    .on('release', function(d, i) { 
+                        map_svg.selectAll(".info2").remove();
+                    });
+
+                var dataInfo = [{label: "Symptoms",     x: 1000, y: 340}];
+                var dataInfo2 = [{label: "Transmission Path", x: 1170, y: 340 }];
+                // Add buttons
+        
+                var buttons = map_svg.selectAll('.infoButton')
+                    .data(dataInfo)
+                    .enter()
+                    .append('g')
+                    .attr('class', 'infoButton')
+                    .call(button);
+
+                var buttons2 = map_svg.selectAll('.infoButton2')
+                    .data(dataInfo2)
+                    .enter()
+                    .append('g')
+                    .attr('class', 'infoButton2')
+                    .call(button2);
+                
+                //**********************************************MAP****************************************************//
+
+                //**********************************************Bar****************************************************//
+                var y = d3.scaleBand()
+                .range([height, 0])
+                .padding(0.1);
+
+                var x = d3.scaleLinear()
+                        .range([0, width]);
+
+                // format the data
+                var bar_data_filter = bar_data_filter.sort(function(a, b) {
+                    return d3.descending(+a.Cases, +b.Cases);
+                }).slice(0, 10);
+                bar_data_filter = bar_data_filter.sort(function(a,b) { return +a.Cases - +b.Cases })
+                // Scale the range of the data in the domains
+                x.domain([0, d3.max(bar_data_filter, function(d){ return d.Cases; })])
+                y.domain(bar_data_filter.map(function(d) { return d.Disease; }));
+                //y.domain([0, d3.max(data, function(d) { return d.sales; })]);
+                
+                // append the rectangles for the bar chart
+                bar_svg.selectAll("rect")
+                    .data(bar_data_filter)
+                    .enter().append("rect")
+                    .attr("class", "bar")
+                    .attr("y", function(d) { return y(0); })
+                    .attr("height", y.bandwidth())
+                    //.attr("x", function(d) { return x(d.sales); })
+                    .attr("width", function(d) {return x(d.Cases); } )		
+                    .attr("fill", "#F89360")
+                    .on('mouseover', function (d) {
+                        d3.select(this).transition()
+                        .duration('50')
+                        .attr('opacity', '.55');
+                        tip.transition()
+                        .duration(50)
+                        .style("opacity", 1);
+                        tip.html("<strong>Year: </strong>" + d.Year + "<br/>" + "<strong>Total Cases: </strong>" + d.Cases)
+                        .style("left", (d3.event.pageX - 75) + "px")
+                        .style("top", (d3.event.pageY - 50) + "px");
+
+                    })
+                    .on('mouseout', function (d) {
+                        d3.select(this).transition()
+                            .duration('50')
+                            .attr('opacity', '1')
+                        tip.transition()       
+                            .duration(500)      
+                            .style("opacity", 0);
+                    })
+                    console.log(y.bandwidth())
+                    //animation
+                    bar_svg.selectAll("rect")
+                        .transition()
+                        .duration(2000)
+                        .attr("width", function(d) {return x(d.Cases); } )
+                        .attr("y", function(d) { return y(d.Disease); })
+                        .delay(function(d,i){console.log(i) ; return(i*100)})
+
+                    // add the x Axis
+                    bar_svg.append("g")
+                        .attr("transform", "translate(0," + height + ")")
+                        .attr("class","barXaxis")
+                        .call(d3.axisBottom(x));
+
+                    bar_svg.append("text")             
+                        .attr("transform",
+                        "translate(" + (width/2) + " ," + 
+                                    (height + margin.top + 10) + ")")
+                        .style("text-anchor", "middle")
+                        .style("font-size","18px")
+                        .text("Cases");
+                    // add the y Axis
+                    bar_svg.append("g")
+                        .attr("class","barYaxis")
+                        .call(d3.axisLeft(y));
+
+                    bar_svg.append("text")
+                                .attr("transform", "rotate(-90)")
+                                    .attr("y", 0 - margin.left)
+                                    .attr("x",0 - (height / 2))
+                                    .attr("dy", "1em")
+                                    .style("text-anchor", "middle")
+                                    .style("font-size","18px") ;  
+                                    //.text("Diseases"); 
+                
+                    //append title
+                    bar_svg.append("text")
+                            .attr("class", "bar_txt")
+                            .attr("x", (width / 2))              
+                            .attr("y", 10 - (margin.top / 2))
+                            .attr("text-anchor", "middle")  
+                            .style("font-size", "25px") 
+                            //.attr("margin-bottom","20px")    
+                            .text("Top 10 Disease in "+ countyName[0] +  " in Year " + yearName[0]);
+                
+                //**********************************************Bar****************************************************//
+                
+                //**********************************************LINE****************************************************//
+                var sumstat = d3.nest() 
+                    .key(d => d.Disease)
+                    .rollup(function(d){ return d3.sum(d, function(g) { return g.Cases;})})           
+                    .entries(line_data_filter);
+                
+                var sorted_sumstat =sumstat.sort(function(a, b) {return d3.descending(+a.value, +b.value);}).slice(0, 10);//top 10 here
+                var top_disease = data.filter(function(d){return d.County==countyName[0] && d.Sex=="TOTAL" &&(d.County != 'CALIFORNIA')})
+                var top_disease = top_disease.filter(function(d){return d.Disease == sorted_sumstat[0].key ||d.Disease == sorted_sumstat[1].key|| 
+                    d.Disease == sorted_sumstat[2].key || d.Disease == sorted_sumstat[3].key || d.Disease == sorted_sumstat[4].key})
+
+                var diseasesName = top_disease.map(d => d.key) 
+                var color = d3.scaleOrdinal().domain(diseasesName).range(colorbrewer.Set2[6])
+                
+
+                var line_newX = d3.scaleLinear()
+                    .domain(d3.extent(top_disease, function(d) { return d.Year; }))
+                    .range([ 0, line_width ]);
+                
+                line_svg.append("g")
+                    .attr("transform", "translate(0," + line_height + ")")
+                    .style("font-size", "13px") 
+                    .call(d3.axisBottom(line_newX).ticks(7).tickFormat(d3.format('')));
+                
+                line_svg.append("text")             
+                    .attr("transform",
+                    "translate(" + (line_width/2) + " ," + 
+                                (line_height + line_margin.top + 10) + ")")
+                    .style("text-anchor", "middle")
+                    .text("Year");
+
+                var line_newY = d3.scaleLinear()
+                    .domain([0, d3.max(top_disease, function(d) { return d.Cases; })])
+                    .range([ line_height, 0 ]);
+                
+                line_svg.append("g")
+                    .attr("class","yleftaxis")
+                    .style("font-size", "13px")    
+                    .call(d3.axisLeft(line_newY))
+
+                line_svg.append("text")
+                    .attr("transform", "rotate(-90)")
+                    .attr("y", -line_margin.left+15)
+                    .attr("x",0 - (line_height / 2))
+                    .attr("dy", "1em")
+                    .style("text-anchor", "middle")  
+                    .text("Cases");  
+                //console.log(top_disease)
+
+                var top_disease_sumstat = d3.nest() // nest function allows to group the calculation per level of a factor
+                    .key(function(d) { return d.Disease;})
+                    .entries(top_disease);
+
+                console.log("top_disease_sumstat: ", top_disease_sumstat)
+
+                var cases_line = line_svg.selectAll(".line")
+                    .data(top_disease_sumstat)
+                    .enter()
+                    .append("path")
+                    .attr("fill", "none")
+                    .attr("stroke", function(d){ return color(d.key) })
+                    .attr("stroke-width", 1.5)
+                    .attr("d", function(d){
+                        return d3.line()
+                        .x(function(d) { return line_newX(d.Year); })
+                        .y(function(d) { return line_newY(d.Cases); })
+                        (d.values)
+                    })
+
+                var line_legend = line_svg
+                    .selectAll('g.legend')
+                    .data(top_disease_sumstat)
+                    .enter()
+                    .append("g")
+                    .attr("class", "line_legend");
+
+                line_legend.append("circle")
+                    .attr("cx", 480)
+                    .attr('cy', (d, i) => i * 30 + 10)
+                    .attr("r", 4)
+                    .style("fill", d => color(d.key))
+
+                line_legend.append("text")
+                    .attr("x", 500)
+                    .attr("y", (d, i) => i * 30 + 15)
+                    .style("font-size", "13px") 
+                    .text(d => d.key)
+                    .call(wrap,150)
+                
+                //title
+                line_svg.append("text")
+                    .attr("class", "line_txt")
+                    .attr("x", (line_width / 2 + 100))              
+                    .attr("y", 10 - (line_margin.top / 2))
+                    .attr("text-anchor", "middle")  
+                    .style("font-size", "25px")     
+                    .text("Top 5 Disease in " + countyName[0] + " from 2001 - 2018");
+                
+                // console.log(top_disease)
+                // console.log(top_disease_sumstat)
+                console.log("line_legend: ", line_legend)
+                    
+                const circleEnter = line_svg.selectAll("g.dot")
+                    .data(top_disease_sumstat)
+                    .enter().append("g")
+                    .attr("class", "dot")
+                    .selectAll("myCircles")
+                    .data(function(d) { return d.values; })
+                    .enter();
+
+                // console.log("circleEnter: ", circleEnter)
+
+                circleEnter.append("circle")
+                    .style("fill", d => color(d.Disease))
+                    .attr("stroke", "none")
+                    .attr("cx", function(d,i) { return line_newX(d.Year) })
+                    .attr("cy", function(d,i) { return line_newY(d.Cases) })
+                    .attr("r", 3.5)
+                    .on('mouseover', function (d) {
+                        d3.select(this).transition()
+                        .duration('50')
+                        .attr('opacity', '.55');
+                        tip.transition()
+                        .duration(50)
+                        .style("opacity", 1);
+                        tip.html("<strong>Disease: </strong>" + d.Disease + "<br/>" + "<strong>Year: </strong>" + d.Year + "<br/>" + "<strong>Total Cases: </strong>" + d.Cases)
+                        .style("left", (d3.event.pageX - 75) + "px")
+                        .style("top", (d3.event.pageY - 50) + "px");
+
+                    })
+                    .on('mouseout', function (d) {
+                        d3.select(this).transition()
+                            .duration('50')
+                            .attr('opacity', '1')
+                        tip.transition()       
+                            .duration(500)      
+                            .style("opacity", 0);
+                    })
+                    
+                    //**********************************************LINE****************************************************//
+                function update() {
+
+                    map_svg.selectAll(".subunit").remove()
+                    
+                    var county_e = document.getElementById("countyButton");
+                    var selectedCounty = county_e.options[county_e.selectedIndex].text;
+                    var disease_e = document.getElementById("diseaseButton");
+                    var selectedDisease = disease_e.options[disease_e.selectedIndex].text;
+                    var selectedYear = document.getElementById("yearSlider").value
+                    
+                    //var year_e = document.getElementById("yearButton");
+                    //var selectedYear = year_e.options[year_e.selectedIndex].text;
+                    console.log("Year: " + selectedYear)
+                    var map_filter = data.filter(function(d){return d.Disease==selectedDisease && d.Sex=="TOTAL" && d.Year==selectedYear && (d.County != 'CALIFORNIA')})
+                    var bar_filter = data.filter(function(d){return d.County==selectedCounty && d.Sex=="TOTAL" && d.Year==selectedYear})
+                    var line_filter = data.filter(function(d){return d.County==selectedCounty && (d.County != 'CALIFORNIA') && d.Sex=="TOTAL"})
+                    var disease_info_filter = disease_info.filter(function(d){return d.Disease==selectedDisease})
+                    var transPath=d3.map(disease_info_filter, function(d){return(d.Transmission)}).keys()
+                    var symptoms=d3.map(disease_info_filter, function(d){return(d.Symptoms)}).keys()
+                    //**********************************************MAP****************************************************//
+                    //console.log(disease_info_filter)
+                    var new_county_map = d3.map()
+                        map_filter.forEach(function(d){
+                            new_county_map.set(d.County, d.Cases)
+                        });
+                        
+                        var sorting = map_filter.sort(function(a,b) { return -a.Cases - -b.Cases })
+                        console.log(sorting)
+
+                    map_svg.append("path")
+                        .datum(topojson.feature(ca, ca.objects.subunits))
+                        .attr("class", "land")
+                        .attr("d", path);
+
+                    //bind feature data to the map
+                    map_svg.selectAll(".subunit")
+                        .data(topojson.feature(ca, ca.objects.subunits).features)
+                        .enter().append("path")	
+                        .attr("class", "subunit")
+                        .attr("d", path)			
+                        .attr("fill", function(d) {
+                            d.Cases = new_county_map.get((d.properties.name).toUpperCase()) || 0;
+                            console.log(d.Cases)
+                            // Set the color
+                            //console.log(colorScale(d.Cases))
+                            return colorScale(d.Cases);
+                            
+                        })
+                        .on("mouseover", function(d){ //tooltip
+                            div.transition()
+                                .duration(200)
+                                .style("opacity", .9);
+                                div.html("<strong>County: </strong>" + (d.properties.name) + "<br/>" + "<strong>Total Cases: </strong>" + new_county_map.get((d.properties.name).toUpperCase()) + "<br/>"+ "<strong>Ranking: </strong>" + (sorting.findIndex(x => x.County ==(d.properties.name).toUpperCase())+1))
+                                .style("left", (d3.event.pageX) + 75 + "px")
+                                .style("top", (d3.event.pageY - 50) + "px"); 
+                        })
+                        .on("mouseout", function(d) { 
+                            div.transition()
+                                .duration(500)
+                                .style("opacity", 0.0);
+                        });
+                        map_svg.selectAll(".legendThreshold").remove()
+                        // Legend
+                        var map_g = map_svg.append("g")
+                            .attr("class", "legendThreshold")
+                            .attr("transform", "translate(20,60)");
+                        map_g.append("text")
+                            .attr("class", "caption")
+                            .attr("x", 0)
+                            .attr("y", -20)
+                            .style("font-size","20px")
+                            .text("Cases");
+                        var labels = ['0', '1-25', '26-50', '51-75', '76-100', '101-1000','> 1000'];
+                        var map_legend = d3.legendColor()
+                            .labels(function (d) { return labels[d.i]; })
+                            .shapePadding(4)
+                            .scale(colorScale);
+                        map_svg.select(".legendThreshold")
+                            .call(map_legend);
+                    
+                    map_svg.selectAll(".txt").remove();
+                    //map title
+                    map_svg.append("text")
+                            .attr("x", (1300 / 2))              
+                            .attr("y", 15 - (margin.top / 2))
+                            .attr("class", "txt")
+                            .attr("text-anchor", "middle")  
+                            .style("font-size", "25px")     
+                            .text("Severity of "+ selectedDisease +  " in Year " + selectedYear);
+
+                    //exterior border
+                    map_svg.append("path")
+                        .datum(topojson.mesh(ca, ca.objects.subunits, function(a, b) { return a === b;}))
+                        .attr("d", path)
+                        .attr("class", "exterior-boundary");
+
+                    //tooltop declaration
+                    var div = d3.select("#disease_map").append("div")
+                        .attr("class", "tooltip")
+                        .style("opacity", 0);
+                    
+                    map_svg.selectAll(".image").remove();
+                    var imgs = map_svg.selectAll("img").data([0]);
+                    imgs.enter()
+                    .append("svg:image")
+                    .attr("xlink:href", "disease/"+ selectedDisease + ".jpg")
+                    .attr("class","image") 
+                    .attr("x", "980")
+                    .attr("y", "50")
+                    .attr("width", "250")
+                    .attr("height", "250");
+                    
+                    map_svg.selectAll(".info").remove();
+                    map_svg.selectAll(".info2").remove();
+                    map_svg.selectAll(".infoButton").remove();
+                    map_svg.selectAll(".infoButton2").remove();
+
+                    var button = d3.button()
+                    .on('press', function(d, i) {
+                        map_svg.selectAll(".info").remove();
+                        map_svg.selectAll(".info2").remove();
+                        map_svg.selectAll("text.info")
+                            .data(disease_info_filter)
+                            .enter()
+                            .append("text")
+                            .attr("x", "900")              
+                            .attr("y", "400")
+                            .attr("class", "info")
+                            .style("font-size", "20px")
+                            //.style('font-weight','bold') 
+                            //.attr("fill", "#3C403F")
+                            //.attr("padding-bottom","20px")    
+                            .text(symptoms[0] )
+                            .call(wrap, 450);
+                            
+
+                    })
+                    .on('release', function(d, i) { 
+                        map_svg.selectAll(".info").remove();
+                    });
+                
+                    var button2 = d3.button()
+                    .on('press', function(d, i) { 
+
+                        map_svg.selectAll(".info2").remove();
+                        map_svg.selectAll(".info").remove();
+                        map_svg.selectAll("text.info2")
+                            .data(disease_info_filter)
+                            .enter()
+                            .append("text")
+                            .attr("x", "900")              
+                            .attr("y", "400")
+                            .attr("class", "info2")
+                            .style("font-size", "20px") 
+                            //.style('font-weight','bold')
+                            //.attr("fill", "#3C403F") 
+                            //.attr("padding-bottom","20px")    
+                            .text(transPath[0] )
+                            .call(wrap, 450);
+
+                        
+                    })
+                    .on('release', function(d, i) { 
+                        map_svg.selectAll(".info2").remove();
+                    });
+
+                var dataInfo = [{label: "Symptoms",     x: 1000, y: 340}];
+                var dataInfo2 = [{label: "Transmission Path", x: 1170, y: 340 }];
+                // Add buttons
+        
+                var buttons = map_svg.selectAll('.infoButton')
+                    .data(dataInfo)
+                    .enter()
+                    .append('g')
+                    .attr('class', 'infoButton')
+                    .call(button);
+
+                var buttons2 = map_svg.selectAll('.infoButton2')
+                    .data(dataInfo2)
+                    .enter()
+                    .append('g')
+                    .attr('class', 'infoButton2')
+                    .call(button2);
+
+                //**********************************************MAP****************************************************//
+                
+                //**********************************************BAR****************************************************//
+                    var bar_filter = bar_filter.sort(function(a, b) {
+                        return d3.descending(+a.Cases, +b.Cases);
+                    }).slice(0, 10);
+                    bar_filter = bar_filter.sort(function(a,b) { return +a.Cases - +b.Cases })
+                    var newCasesXScale = d3.max(bar_filter, function(d) { return d.Cases; })
+                    var newCasesYScale = bar_filter.map(function(d) { return d.Disease; })
+                    
+                    console.log(newCasesXScale)
+                    if (newCasesXScale < 10) {
+                        newCasesXScale = 10;
+                    }
+
+                    var bar_newX = d3.scaleLinear()
+                        .domain([0, newCasesXScale])
+                        .range([0, width]);
+
+                    var bar_newY = d3.scaleBand()
+                    .domain(newCasesYScale)
+                    .range([height, 0])
+                    .padding(0.1);
+                    // Give these new data to update line
+                    bar_svg.selectAll("rect").transition().remove()
+
+                var rects = bar_svg.selectAll("rect")
+                    .data(bar_filter)
+                    .attr("y", function(d) { return bar_newY(0); })
+                    .attr("height", y.bandwidth())
+                    //.attr("x", function(d) { return x(d.sales); })
+                    .attr("width", function(d) {return bar_newX(d.Cases); } )
+                    .attr("fill", "#F89360")
+
+                    //animation
+                    bar_svg.selectAll("rect")
+                    .transition()
+                    .duration(2000)
+                    
+                    .attr("width", function(d) {return bar_newX(d.Cases); } )
+                    .attr("y", function(d) { return bar_newY(d.Disease); })
+                    .delay(function(d,i){console.log(i) ; return(i*100)})
+
+
+                    rects.on('mouseover', function (d) {
+                        d3.select(this).transition()
+                        .duration('50')
+                        .attr('opacity', '.55');
+                        tip.transition()
+                        .duration(50)
+                        .style("opacity", 1);
+                        tip.html("<strong>Year: </strong>" + d.Year + "<br/>" + "<strong>Total Cases: </strong>" + d.Cases)
+                        .style("left", (d3.event.pageX - 75) + "px")
+                        .style("top", (d3.event.pageY - 50) + "px");
+
+                    })
+                    .on('mouseout', function (d) {
+                        d3.select(this).transition()
+                            .duration('50')
+                            .attr('opacity', '1')
+                        tip.transition()       
+                            .duration(500)      
+                            .style("opacity", 0);
+                    })
+                    
+
+                    d3.selectAll(".barXaxis")
+                        //.attr("transform", "translate(0," + height + ")")
+                                .transition()
+                                .call(d3.axisBottom(bar_newX));
+                    
+                        //.attr("stroke", "#FF7F50")         
+                
+                    d3.selectAll(".barYaxis")
+                                .transition()
+                                .call(d3.axisLeft(bar_newY));
+                    
+                    bar_svg.selectAll(".bar_txt").remove();
+                    
+                    bar_svg.append("text")
+                            .attr("class", "bar_txt")
+                            .attr("x", (width / 2))              
+                            .attr("y", 10 - (margin.top / 2))
+                            .attr("text-anchor", "middle")  
+                            .style("font-size", "25px")     
+                            .text("Top 10 Disease in "+ selectedCounty +  " in Year " + selectedYear);
+                
+                //**********************************************BAR****************************************************//
+
+                //**********************************************LINE****************************************************//
+                var sumstat = d3.nest() 
+                        .key(d => d.Disease)
+                        .rollup(function(d){ return d3.sum(d, function(g) { return g.Cases;})})           
+                        .entries(line_filter);
+                
+                    var sorted_sumstat =sumstat.sort(function(a, b) {return d3.descending(+a.value, +b.value);}).slice(0, 10);//top 10 here
+                    var top_disease = data.filter(function(d){return d.County==selectedCounty && (d.County != 'CALIFORNIA') && d.Sex=="TOTAL"})
+                    var top_disease = top_disease.filter(function(d){return d.Disease == sorted_sumstat[0].key ||d.Disease == sorted_sumstat[1].key|| 
+                        d.Disease == sorted_sumstat[2].key || d.Disease == sorted_sumstat[3].key || d.Disease == sorted_sumstat[4].key})
+
+                    var diseasesName = top_disease.map(d => d.key) 
+                    var newColor = d3.scaleOrdinal().domain(diseasesName).range(colorbrewer.Set2[6])
+
+                    var newDiseaseYScale = d3.max(top_disease, function(d) { return d.Cases; })*1.1
+
+                    console.log("top_disease: ", top_disease)
+                    
+
+                    if (newDiseaseYScale < 10) {
+                        newDiseaseYScale = 10;
+                    }
+
+                    // console.log(newDiseaseYScale)
+
+                    var line_newY = d3.scaleLinear()
+                        .domain([0, newDiseaseYScale])
+                        .range([line_height, 0 ]);
+
+                    
+                    // Give these new data to update line
+                    var filter_sumstat = d3.nest() // nest function allows to group the calculation per level of a factor
+                        .key(function(d) { 
+                            return d.Disease;})
+                        .entries(top_disease);
+
+                    cases_line.data(filter_sumstat)
+                        .transition()
+                        .duration(2000)
+                        .attr("fill", "none")
+                        .attr("stroke", function(d){ return newColor(d.key) })
+                        .attr("d", function(d){
+                            return d3.line()
+                            .x(function(d) { return line_newX(d.Year); })
+                            .y(function(d) { return line_newY(d.Cases); })
+                            (d.values)
+                    })
+
+                    console.log("filter_sumstat:", filter_sumstat)
+                    line_svg.selectAll(".line_legend").remove()
+                    
+                    var updateLegend = line_svg.selectAll('g.legend')
+                        .data(filter_sumstat)
+
+                    var legendEnter = updateLegend.enter().append("g")
+                        .attr("class", "line_legend")
+                        //.attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+                    legendEnter.append("circle")
+                        .attr("cx", 480)
+                        .attr('cy', (d, i) => i * 30 + 10)
+                        .attr("r", 4)
+                        .style("fill", d => newColor(d.key))
+
+                    legendEnter.append("text")
+                        .attr("x", 500)
+                        .attr("y", (d, i) => i * 30 + 15)
+                        .text(d => d.key)
+                        .style("font-size", "13px")
+                        .call(wrap,150) 
+                        //.text("testing")
+
+                    console.log("updateLegend: ", updateLegend)
+
+                    // updateLegend.exit().remove();
+                    
+                    line_svg.selectAll(".dot").remove()
+                
+                    const circleEnterUpdate = line_svg.selectAll("g.dot")
+                        .data(filter_sumstat)
+                        .enter().append("g")
+                        .attr("class", "dot")
+                        .selectAll("myCircles")
+                        .data(function(d) { 
+                            console.log("d.values: ", d.values)
+                            return d.values; })
+                        .enter();
+                        
+                    var newCase = circleEnterUpdate.append("circle")
+                        .style("fill", d => newColor(d.Disease))
+                        .attr("stroke", "none")
+                        .attr("cx", function(d,i) { 
+                            return line_newX(d.Year) })
+                        .attr("cy", function(d,i) { 
+                            return line_newY(d.Cases) })
+                        .attr("r", 3.5)
+                    
+                    newCase.selectAll("#points").transition()
+                        
+                    newCase.on('mouseover', function (d) {
+                            d3.select(this).transition()
+                            .duration('50')
+                            .attr('opacity', '.55');
+                            tip.transition()
+                            .duration(50)
+                            .style("opacity", 1);
+                            tip.html("<strong>Disease: </strong>" + d.Disease + "<br/>" + "<strong>Year: </strong>" + d.Year + "<br/>" + "<strong>Total Cases: </strong>" + d.Cases)
+                            .style("left", (d3.event.pageX - 75) + "px")
+                            .style("top", (d3.event.pageY - 50) + "px");
+                
+                        })
+                        .on('mouseout', function (d) {
+                            d3.select(this).transition()
+                                .duration('50')
+                                .attr('opacity', '1')
+                            tip.transition()       
+                                .duration(500)      
+                                .style("opacity", 0);
+                    })
+
+                    d3.selectAll(".yleftaxis")
+                        .transition()
+                        .call(d3.axisLeft(line_newY));
+                    
+                    line_svg.selectAll(".line_txt").remove();
+                    //title
+                    line_svg.append("text")
+                            .attr("class", "line_txt")
+                            .attr("x", (line_width / 2 + 100))              
+                            .attr("y", 10 - (line_margin.top / 2))
+                            .attr("text-anchor", "middle")  
+                            .style("font-size", "25px")     
+                            .text("Top 5 Diseases in " + selectedCounty + " from 2001 - 2018");
+                    }
+                //**********************************************LINE****************************************************//
+            
+                }
+
+		d3.select("#countyButton").on("change", function(d) {
+            update()
+        })
+
+        d3.select("#diseaseButton").on("change", function(d) {
+            update()
+        })
+
+        d3.select("#yearSlider").on("change", function(d) {
+            update()
+        })
+		
+	});
+
+</script>
+
+</body>
+</html>
